@@ -22,6 +22,7 @@
     <div id="loginScreen" class="hidden fixed inset-0 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
             <div class="text-center mb-8">
+                <img src="https://thebayservices.com/wp-content/uploads/2022/07/bay-services-logo-300x100.png" alt="The Bay Services" class="mx-auto mb-4 h-16">
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">The Bay Services</h1>
                 <p class="text-gray-600">Operator Dashboard</p>
             </div>
@@ -32,14 +33,14 @@
                 <button onclick="loginWithRole('operator')" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                     <div class="text-left">
                         <div class="font-medium">Operator</div>
-                        <div class="text-sm text-blue-100">Access schedule, properties, payments, messages</div>
+                        <div class="text-sm text-blue-100">Dashboard, Automatic Answers, Service Info, Property Management, Browser</div>
                     </div>
                 </button>
                 
                 <button onclick="loginWithRole('manager')" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
                     <div class="text-left">
                         <div class="font-medium">Manager</div>
-                        <div class="text-sm text-green-100">Full access including file management</div>
+                        <div class="text-sm text-green-100">Dashboard, Property Management, Outstanding Payments, Administrative Files, Browser</div>
                     </div>
                 </button>
             </div>
@@ -51,15 +52,21 @@
         <!-- Header -->
         <header class="bg-white shadow-sm border-b">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
+                <div class="flex justify-between items-center h-20">
                     <div class="flex items-center">
-                        <h1 class="text-xl font-semibold text-gray-900">The Bay Services</h1>
-                        <span id="userRole" class="ml-4 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"></span>
+                        <img src="https://thebayservices.com/wp-content/uploads/2022/07/bay-services-logo-300x100.png" alt="The Bay Services" class="h-12 mr-4">
+                        <span id="userRole" class="ml-4 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium"></span>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span id="currentTime" class="text-sm text-gray-500"></span>
-                        <span id="userName" class="text-sm font-medium text-gray-700"></span>
-                        <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800">Logout</button>
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <div id="currentTime" class="text-lg font-semibold text-gray-900"></div>
+                            <div class="text-sm text-gray-500">California Time</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-500">Current Operator</div>
+                            <div id="currentOperatorName" class="text-sm font-medium text-gray-900">Loading...</div>
+                        </div>
+                        <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800 font-medium">Logout</button>
                     </div>
                 </div>
             </div>
@@ -68,58 +75,81 @@
         <!-- Navigation -->
         <nav class="bg-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex space-x-8">
-                    <button onclick="showSection('schedule')" class="nav-btn text-white px-3 py-4 text-sm font-medium hover:bg-gray-700 active">
-                        Schedule
-                    </button>
-                    <button onclick="showSection('properties')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
-                        Properties
-                    </button>
-                    <button onclick="showSection('payments')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
-                        Payments
-                    </button>
-                    <button onclick="showSection('messages')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
-                        Messages
-                    </button>
-                    <button onclick="showSection('services')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
-                        Services
-                    </button>
-                    <button onclick="showSection('browser')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
-                        Browser
-                    </button>
-                    <button onclick="showSection('files')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700 manager-only">
-                        Files
-                    </button>
-                    <button onclick="showSection('map')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
-                        Map
-                    </button>
+                <div class="flex space-x-8" id="navigationTabs">
+                    <!-- Navigation will be populated by JavaScript based on role -->
                 </div>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <!-- Schedule Section -->
-            <div id="scheduleSection" class="section">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Current Schedule</h2>
-                    <div id="currentOperator" class="mb-6 p-4 bg-blue-50 rounded-lg">
-                        <p class="text-sm text-blue-600 font-medium">Current Operator</p>
-                        <p id="currentOperatorName" class="text-lg font-semibold text-blue-900">Loading...</p>
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="section">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Dashboard Overview</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-medium text-blue-900">Active Properties</h3>
+                            <p class="text-2xl font-bold text-blue-600" id="activePropertiesCount">0</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-medium text-green-900">Completed Today</h3>
+                            <p class="text-2xl font-bold text-green-600" id="completedTodayCount">0</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="font-medium text-yellow-900">Pending Tasks</h3>
+                            <p class="text-2xl font-bold text-yellow-600" id="pendingTasksCount">0</p>
+                        </div>
                     </div>
-                    <div id="scheduleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+
+                <!-- Schedule Section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Weekly Schedule</h3>
+                    <div id="scheduleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
                         <!-- Schedule items will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
 
-            <!-- Properties Section -->
-            <div id="propertiesSection" class="section hidden">
+            <!-- Automatic Answers Section (Operator Only) -->
+            <div id="automaticAnswersSection" class="section hidden operator-only">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-medium text-gray-900">Automatic Answers</h2>
+                        <select id="operatorNameSelect" class="px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="Thomas">Thomas</option>
+                            <option value="David">David</option>
+                            <option value="Emma">Emma</option>
+                            <option value="Eric">Eric</option>
+                            <option value="Nora">Nora</option>
+                            <option value="Trinity">Trinity</option>
+                            <option value="Kenny">Kenny</option>
+                        </select>
+                    </div>
+                    <div id="messageTemplates" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Message templates will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Info & Prices Section (Operator Only) -->
+            <div id="serviceInfoSection" class="section hidden operator-only">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-6">Service Information & Prices</h2>
+                    <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Services will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Management Section -->
+            <div id="propertyManagementSection" class="section hidden">
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-medium text-gray-900">Property Management</h2>
+                        <h2 class="text-lg font-medium text-gray-900">Property Management List</h2>
                         <button onclick="addProperty()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                            Add Property
+                            Add New Property
                         </button>
                     </div>
                     <div id="propertiesList" class="space-y-4">
@@ -128,32 +158,39 @@
                 </div>
             </div>
 
-            <!-- Payments Section -->
-            <div id="paymentsSection" class="section hidden">
+            <!-- Outstanding Payments Section (Manager Only) -->
+            <div id="outstandingPaymentsSection" class="section hidden manager-only">
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Outstanding Payments</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-medium text-gray-900">Outstanding Payments</h2>
+                        <button onclick="addPayment()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            Add New Payment
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h3 class="font-medium text-red-900">Total Outstanding</h3>
+                            <p class="text-2xl font-bold text-red-600" id="totalOutstanding">$0.00</p>
+                        </div>
+                    </div>
                     <div id="paymentsList" class="space-y-4">
                         <!-- Payments will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
 
-            <!-- Messages Section -->
-            <div id="messagesSection" class="section hidden">
+            <!-- Administrative Files Section (Manager Only) -->
+            <div id="administrativeFilesSection" class="section hidden manager-only">
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Message Templates</h2>
-                    <div id="messageTemplates" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Message templates will be populated by JavaScript -->
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Administrative Files</h2>
+                    <div class="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                        <input type="file" id="fileInput" multiple class="mb-2 w-full">
+                        <button onclick="uploadFiles()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            Upload Files
+                        </button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Services Section -->
-            <div id="servicesSection" class="section hidden">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Service Information</h2>
-                    <div id="servicesList" class="space-y-6">
-                        <!-- Services will be populated by JavaScript -->
+                    <div id="filesList" class="space-y-2">
+                        <!-- Files will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
@@ -162,49 +199,61 @@
             <div id="browserSection" class="section hidden">
                 <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-medium text-gray-900 mb-4">Web Browser</h2>
-                    <div class="mb-4 flex flex-wrap gap-2">
-                        <button onclick="loadSite('https://gmail.com')" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Gmail</button>
-                        <button onclick="loadSite('https://calendar.google.com')" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Calendar</button>
-                        <button onclick="loadSite('https://drive.google.com')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Drive</button>
-                    </div>
-                    <div class="mb-4">
-                        <input type="url" id="urlInput" placeholder="Enter URL..." class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                        <button onclick="loadCustomUrl()" class="mt-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Load</button>
-                    </div>
-                    <div class="border rounded-lg overflow-hidden" style="height: 600px;">
-                        <iframe id="browserFrame" src="about:blank" class="w-full h-full border-0"></iframe>
-                    </div>
-                </div>
-            </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Browser 1 -->
+                        <div>
+                            <h3 class="text-md font-medium text-gray-700 mb-2">Browser 1</h3>
+                            <div class="mb-4 flex flex-wrap gap-2">
+                                <button onclick="loadSite('https://gmail.com', 1)" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Gmail</button>
+                                <button onclick="loadSite('https://calendar.google.com', 1)" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Calendar</button>
+                                <button onclick="loadSite('https://drive.google.com', 1)" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Drive</button>
+                            </div>
+                            <div class="mb-4">
+                                <input type="url" id="urlInput1" placeholder="Enter URL..." class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <button onclick="loadCustomUrl(1)" class="mt-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Load</button>
+                            </div>
+                            <div class="border rounded-lg overflow-hidden" style="height: 500px;">
+                                <iframe id="browserFrame1" src="about:blank" class="w-full h-full border-0"></iframe>
+                            </div>
+                        </div>
 
-            <!-- Files Section -->
-            <div id="filesSection" class="section hidden manager-only">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">File Management</h2>
-                    <div class="mb-4">
-                        <input type="file" id="fileInput" multiple class="mb-2">
-                        <button onclick="uploadFiles()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Upload</button>
-                    </div>
-                    <div id="filesList" class="space-y-2">
-                        <!-- Files will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Map Section -->
-            <div id="mapSection" class="section hidden">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Bay Area Map</h2>
-                    <div class="mb-4">
-                        <input type="text" id="mapSearch" placeholder="Search location..." class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                        <button onclick="searchLocation()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Search</button>
-                    </div>
-                    <div id="mapContainer" class="h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <p class="text-gray-500">Interactive map would be loaded here</p>
+                        <!-- Browser 2 -->
+                        <div>
+                            <h3 class="text-md font-medium text-gray-700 mb-2">Browser 2</h3>
+                            <div class="mb-4 flex flex-wrap gap-2">
+                                <button onclick="loadSite('https://gmail.com', 2)" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Gmail</button>
+                                <button onclick="loadSite('https://calendar.google.com', 2)" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Calendar</button>
+                                <button onclick="loadSite('https://drive.google.com', 2)" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Drive</button>
+                            </div>
+                            <div class="mb-4">
+                                <input type="url" id="urlInput2" placeholder="Enter URL..." class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <button onclick="loadCustomUrl(2)" class="mt-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Load</button>
+                            </div>
+                            <div class="border rounded-lg overflow-hidden" style="height: 500px;">
+                                <iframe id="browserFrame2" src="about:blank" class="w-full h-full border-0"></iframe>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Service Detail Modal -->
+    <div id="serviceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="serviceModalTitle" class="text-xl font-semibold text-gray-900"></h3>
+                <button onclick="closeServiceModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="serviceModalContent" class="text-gray-700">
+                <!-- Service details will be populated by JavaScript -->
+            </div>
+        </div>
     </div>
 
     <script src="data.js"></script>
