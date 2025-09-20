@@ -15,7 +15,7 @@ class DashboardApp {
       FILES: "files",
       SCHEDULE: "schedule",
     }
-    this.sampleData = {
+    this.sampleData = window.sampleData || {
       properties: [],
       payments: [],
       messageTemplates: [],
@@ -383,13 +383,14 @@ class DashboardApp {
     if (!list) return
 
     const payments = this.getStoredData(this.STORAGE_KEYS.PAYMENTS) || this.sampleData.payments
+    const unpaidPayments = payments.filter((p) => p.status !== "Paid")
 
     // Calculate total outstanding
-    const totalOutstanding = payments.filter((p) => p.status !== "Paid").reduce((sum, p) => sum + p.amount, 0)
+    const totalOutstanding = unpaidPayments.reduce((sum, p) => sum + p.amount, 0)
 
     document.getElementById("totalOutstanding").textContent = `$${totalOutstanding.toLocaleString()}`
 
-    list.innerHTML = payments
+    list.innerHTML = unpaidPayments
       .map(
         (payment) => `
       <div class="payment-card bg-gray-50 p-6 rounded-lg border hover:shadow-md transition-shadow">
@@ -709,6 +710,14 @@ class DashboardApp {
     this.saveData(this.STORAGE_KEYS.FILES, filtered)
     this.loadFilesData()
   }
+
+  switchRole() {
+    this.userData.userRole = this.userData.userRole === "operator" ? "manager" : "operator"
+    this.saveUserData()
+    this.updateUserInterface()
+    this.setupNavigation()
+    this.showSection("dashboard") // Go back to dashboard on role switch
+  }
 }
 
 // Global functions for HTML onclick handlers
@@ -758,6 +767,10 @@ function uploadFiles() {
 
 function closeServiceModal() {
   window.app.closeServiceModal()
+}
+
+function switchRole() {
+  window.app.switchRole()
 }
 
 // Initialize the application
