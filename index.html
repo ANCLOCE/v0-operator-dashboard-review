@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bay Services - Operator Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-blue-600 flex items-center justify-center z-50">
+        <div class="text-center text-white">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+            <h1 class="text-2xl font-bold">The Bay Services</h1>
+            <p class="text-blue-200">Loading Dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="hidden fixed inset-0 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">The Bay Services</h1>
+                <p class="text-gray-600">Operator Dashboard</p>
+            </div>
+            
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left">
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="demoLogin()" class="text-blue-600 hover:text-blue-800 text-sm underline">
+                    Demo Login (No Google Account Required)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-semibold text-gray-900">The Bay Services</h1>
+                        <span id="userRole" class="ml-4 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"></span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="currentTime" class="text-sm text-gray-500"></span>
+                        <span id="userName" class="text-sm font-medium text-gray-700"></span>
+                        <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-8">
+                    <button onclick="showSection('schedule')" class="nav-btn text-white px-3 py-4 text-sm font-medium hover:bg-gray-700 active">
+                        Schedule
+                    </button>
+                    <button onclick="showSection('properties')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
+                        Properties
+                    </button>
+                    <button onclick="showSection('payments')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
+                        Payments
+                    </button>
+                    <button onclick="showSection('messages')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
+                        Messages
+                    </button>
+                    <button onclick="showSection('services')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
+                        Services
+                    </button>
+                    <button onclick="showSection('browser')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
+                        Browser
+                    </button>
+                    <button onclick="showSection('files')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700 manager-only">
+                        Files
+                    </button>
+                    <button onclick="showSection('map')" class="nav-btn text-gray-300 px-3 py-4 text-sm font-medium hover:bg-gray-700">
+                        Map
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <!-- Schedule Section -->
+            <div id="scheduleSection" class="section">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Current Schedule</h2>
+                    <div id="currentOperator" class="mb-6 p-4 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-blue-600 font-medium">Current Operator</p>
+                        <p id="currentOperatorName" class="text-lg font-semibold text-blue-900">Loading...</p>
+                    </div>
+                    <div id="scheduleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Schedule items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Properties Section -->
+            <div id="propertiesSection" class="section hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-medium text-gray-900">Property Management</h2>
+                        <button onclick="addProperty()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            Add Property
+                        </button>
+                    </div>
+                    <div id="propertiesList" class="space-y-4">
+                        <!-- Properties will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Section -->
+            <div id="paymentsSection" class="section hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Outstanding Payments</h2>
+                    <div id="paymentsList" class="space-y-4">
+                        <!-- Payments will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div id="messagesSection" class="section hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Message Templates</h2>
+                    <div id="messageTemplates" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Message templates will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Section -->
+            <div id="servicesSection" class="section hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Service Information</h2>
+                    <div id="servicesList" class="space-y-6">
+                        <!-- Services will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Browser Section -->
+            <div id="browserSection" class="section hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Web Browser</h2>
+                    <div class="mb-4 flex flex-wrap gap-2">
+                        <button onclick="loadSite('https://gmail.com')" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Gmail</button>
+                        <button onclick="loadSite('https://calendar.google.com')" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Calendar</button>
+                        <button onclick="loadSite('https://drive.google.com')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Drive</button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="url" id="urlInput" placeholder="Enter URL..." class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <button onclick="loadCustomUrl()" class="mt-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Load</button>
+                    </div>
+                    <div class="border rounded-lg overflow-hidden" style="height: 600px;">
+                        <iframe id="browserFrame" src="about:blank" class="w-full h-full border-0"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            <div id="filesSection" class="section hidden manager-only">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">File Management</h2>
+                    <div class="mb-4">
+                        <input type="file" id="fileInput" multiple class="mb-2">
+                        <button onclick="uploadFiles()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Upload</button>
+                    </div>
+                    <div id="filesList" class="space-y-2">
+                        <!-- Files will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div id="mapSection" class="section hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Bay Area Map</h2>
+                    <div class="mb-4">
+                        <input type="text" id="mapSearch" placeholder="Search location..." class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <button onclick="searchLocation()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Search</button>
+                    </div>
+                    <div id="mapContainer" class="h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <p class="text-gray-500">Interactive map would be loaded here</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
