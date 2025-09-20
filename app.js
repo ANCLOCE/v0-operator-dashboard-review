@@ -50,15 +50,10 @@ class DashboardApp {
     this.startTimeUpdater()
     this.showLoadingScreen()
 
-    // Simulate loading time
     setTimeout(() => {
       this.hideLoadingScreen()
-      if (!this.userData.isLoggedIn) {
-        this.showLoginScreen()
-      } else {
-        this.showDashboard()
-      }
-    }, 2000)
+      this.showLoginScreen()
+    }, 1500)
   }
 
   loadUserData() {
@@ -460,21 +455,17 @@ class DashboardApp {
 }
 
 // Global functions for HTML onclick handlers
-function handleCredentialResponse(response) {
-  // In a real implementation, you would verify the JWT token
-  window.app.userData.currentUser = "Google User"
-  window.app.userData.userRole = "operator" // or determine from token
+function loginWithRole(role) {
+  window.app.userData.currentUser = role === "manager" ? "Manager User" : "Operator User"
+  window.app.userData.userRole = role
   window.app.userData.isLoggedIn = true
   window.app.saveUserData()
   window.app.showDashboard()
 }
 
 function demoLogin() {
-  window.app.userData.currentUser = "Demo User"
-  window.app.userData.userRole = "manager" // Demo as manager to show all features
-  window.app.userData.isLoggedIn = true
-  window.app.saveUserData()
-  window.app.showDashboard()
+  // This function is no longer needed but kept for compatibility
+  loginWithRole("manager")
 }
 
 function logout() {
